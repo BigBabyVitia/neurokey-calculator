@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { Analytics } from "@vercel/analytics/react";
 
-const ADMIN_PASS = "nk-product3103";
 
 const DC = { bankCommission: 0.03, openrouterCommission: 0.055, usdRub: 80, creditPriceUsd: 0.01, contactUrl: "https://t.me/Lud_AI" };
 const DM = { "Базовый": 0.80, "Премиум": 0.55, "Ультра": 0.45, "Дизайн": 0.55 };
@@ -534,6 +533,7 @@ export default function App(){
   const [pg,setPg]=useState(()=>window.location.hash==="#admin"?(sessionStorage.getItem("nk-admin")==="1"?"admin":"login"):"client");
   const [pw,setPw]=useState("");
   const [pwErr,setPwErr]=useState(false);
+  const [loginLoading,setLoginLoading]=useState(false);
   const [menuOpen,setMenuOpen]=useState(false);
 
   useEffect(()=>{
@@ -546,9 +546,17 @@ export default function App(){
     return ()=>window.removeEventListener("hashchange",onHash);
   },[]);
 
-  const tryLogin=()=>{
-    if(pw===ADMIN_PASS){setAuthed(true);sessionStorage.setItem("nk-admin","1");setPwErr(false);setPg("admin");}
-    else setPwErr(true);
+  const tryLogin=async()=>{
+    if(loginLoading)return;
+    setLoginLoading(true);
+    setPwErr(false);
+    try{
+      const res=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})});
+      const data=await res.json();
+      if(data.ok){setAuthed(true);sessionStorage.setItem("nk-admin","1");setPg("admin");}
+      else setPwErr(true);
+    }catch(e){console.error("Login error:",e);setPwErr(true);}
+    finally{setLoginLoading(false);}
   };
   const logout=()=>{setAuthed(false);sessionStorage.removeItem("nk-admin");window.location.hash="";setPg("client");};
 
@@ -652,7 +660,7 @@ export default function App(){
             placeholder="Пароль"
             style={{...rInp,textAlign:"center",border:pwErr?"1.5px solid #ef4444":"1.5px solid transparent",marginBottom:12}}/>
           {pwErr && <div style={{fontSize:12,color:"#ef4444",marginBottom:12}}>Неверный пароль</div>}
-          <button onClick={tryLogin} style={gBtn}>Войти</button>
+          <button onClick={tryLogin} disabled={loginLoading} style={{...gBtn,opacity:loginLoading?0.6:1}}>{loginLoading?"...":"Войти"}</button>
         </div>
       ) : pg==="admin" ? (
         <Admin mods={mods} setMods={setModsD} cfg={cfg} setCfg={setCfgD} mg={mg} setMg={setMgD} reqs={reqs} onSave={onSave} onReset={onReset} dirty={dirty}/>
