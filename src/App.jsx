@@ -414,6 +414,10 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
             <span style={aL}>Ссылка сэйлза</span>
             <input type="url" value={cfg.contactUrl||""} onChange={e=>setCfg({...cfg,contactUrl:e.target.value})} placeholder="https://t.me/..." style={{...aI,width:"auto",flex:1,fontFamily:"'Inter',sans-serif"}}/>
           </div>
+          <a href={cfg.contactUrl} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:6,marginTop:8,fontSize:13,color:"#16a34a",textDecoration:"none",fontWeight:500}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            Проверить ссылку →
+          </a>
         </div>
 
         <Crd title="Текстовые модели" action={<button onClick={()=>ad("text")} style={addB}>+ Добавить</button>}>
@@ -527,6 +531,7 @@ export default function App(){
   const [pg,setPg]=useState(()=>window.location.hash==="#admin"?(sessionStorage.getItem("nk-admin")==="1"?"admin":"login"):"client");
   const [pw,setPw]=useState("");
   const [pwErr,setPwErr]=useState(false);
+  const [menuOpen,setMenuOpen]=useState(false);
 
   useEffect(()=>{
     const onHash=()=>{
@@ -544,21 +549,23 @@ export default function App(){
   };
   const logout=()=>{setAuthed(false);sessionStorage.removeItem("nk-admin");window.location.hash="";setPg("client");};
 
-  const navBtn=(id,label)=>(<button key={id} onClick={()=>setPg(id)} className={`nk-nav ${pg===id?"nk-nav-active":"nk-nav-idle"}`}>{label}</button>);
+  const navBtn=(id,label)=>(<button key={id} onClick={()=>{setPg(id);setMenuOpen(false);}} className={`nk-nav ${pg===id?"nk-nav-active":"nk-nav-idle"}`}>{label}</button>);
 
   return (
     <div style={{fontFamily:"'Inter',-apple-system,sans-serif",background:"#F5F4F0",color:"#3a3a32",minHeight:"100vh"}}>
       <style>{`
-        *{box-sizing:border-box}input,select,textarea{outline:none;font-family:inherit}
+        html,body{margin:0;padding:0;background:#F5F4F0}*{box-sizing:border-box}input,select,textarea{outline:none;font-family:inherit}
         input[type=number]{-moz-appearance:textfield}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
         table{border-collapse:collapse;width:100%}
-        .nk-wrap{padding:0 48px 60px}
-        .nk-wrap-nav{padding:0 48px}
+        .nk-wrap{max-width:1280px;margin:0 auto;padding:0 48px 60px}
+        .nk-wrap-nav{max-width:1280px;margin:0 auto;padding:14px 48px 10px}
         .nk-num-label{display:none;font-size:10px;color:#b0b0a8;margin-top:2px;text-align:center}
         .nk-contact-btn{display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s;margin-left:8px;white-space:nowrap}
         .nk-contact-btn:hover{background:#15803d}
         .nk-contact-short{display:none}
-        @media(max-width:768px){.nk-wrap{padding:0 20px 40px}.nk-wrap-nav{padding:0 20px}.nk-save-bar{margin-inline:-20px !important;padding-inline:20px !important}}
+        .nk-burger{display:none}
+        .nk-nav-menu{display:flex;align-items:center;gap:4px}
+        @media(max-width:768px){.nk-wrap{padding:0 20px 40px}.nk-wrap-nav{padding:14px 20px 10px}.nk-save-bar{margin-inline:-20px !important;padding-inline:20px !important}}
         @media(max-width:600px){
           .nk-hero{padding:32px 0 16px !important}
           .nk-hero-title{font-size:22px !important;line-height:1.25 !important}
@@ -582,8 +589,12 @@ export default function App(){
           .nk-chip-name{font-size:10px !important}
           .nk-limits-title{font-size:16px !important}
           .nk-limits-sub{font-size:13px !important}
-          .nk-nav-brand{display:none !important}
-          .nk-nav{font-size:12px !important;padding:6px 8px !important}
+          .nk-nav-brand{font-size:15px !important}
+          .nk-burger{display:flex !important;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:8px;z-index:51}
+          .nk-burger span{display:block;width:20px;height:2px;background:#3a3a32;border-radius:1px}
+          .nk-nav-menu{display:none !important;position:absolute;top:100%;right:20px;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:8px;flex-direction:column;gap:2px;z-index:50;min-width:180px}
+          .nk-menu-open{display:flex !important}
+          .nk-nav{font-size:15px !important;padding:12px 16px !important;border-radius:10px !important;width:100%;text-align:left}
           .nk-admin-grid{grid-template-columns:1fr !important}
           .nk-contact-btn{padding:6px 12px !important;font-size:12px !important;margin-left:4px !important}
           .nk-contact-full{display:none !important}
@@ -599,23 +610,28 @@ export default function App(){
         .nk-reset-btn:hover{background:rgba(239,68,68,.08);color:#ef4444}
       `}</style>
 
-      <nav style={{borderBottom:"1px solid #e8e6e0"}} className="nk-wrap-nav">
-        <div style={{display:"flex",alignItems:"center",padding:"14px 0 10px"}}>
+      <nav style={{borderBottom:"1px solid #e8e6e0",position:"relative"}}>
+        <div className="nk-wrap-nav" style={{display:"flex",alignItems:"center"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginRight:"auto"}}>
             <Logo size={36}/>
             <span className="nk-nav-brand" style={{fontSize:18,fontWeight:700,color:"#2a2a22",letterSpacing:"-0.02em"}}>Нейроключ</span>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:4}}>
             {authed && <>
-              {navBtn("client","Калькулятор")}
-              {navBtn("admin","Управление")}
-              <button onClick={logout} className="nk-nav nk-nav-idle" style={{fontSize:12,marginLeft:4}}>Выйти</button>
+              <button className="nk-burger" onClick={()=>setMenuOpen(!menuOpen)}>
+                <span/><span/><span/>
+              </button>
+              <div className={`nk-nav-menu${menuOpen?" nk-menu-open":""}`}>
+                {navBtn("client","Калькулятор")}
+                {navBtn("admin","Управление")}
+                <button onClick={()=>{logout();setMenuOpen(false);}} className="nk-nav nk-nav-idle" style={{fontSize:12}}>Выйти</button>
+              </div>
             </>}
-            <a href={cfg.contactUrl} target="_blank" rel="noopener noreferrer" className="nk-contact-btn">
+            {!authed && <a href={cfg.contactUrl} target="_blank" rel="noopener noreferrer" className="nk-contact-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
               <span className="nk-contact-full">Связаться с нами</span>
               <span className="nk-contact-short">Написать</span>
-            </a>
+            </a>}
           </div>
         </div>
       </nav>
