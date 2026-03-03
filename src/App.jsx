@@ -552,7 +552,7 @@ export default function App(){
         *{box-sizing:border-box}input,select,textarea{outline:none;font-family:inherit}
         input[type=number]{-moz-appearance:textfield}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
         table{border-collapse:collapse;width:100%}
-        .nk-wrap{max-width:1280px;margin:0 auto;padding:0 48px 60px}
+        .nk-wrap{padding:0 48px 60px}
         .nk-wrap-nav{padding:0 48px}
         .nk-num-label{display:none;font-size:10px;color:#b0b0a8;margin-top:2px;text-align:center}
         .nk-contact-btn{display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s;margin-left:8px;white-space:nowrap}
@@ -600,7 +600,7 @@ export default function App(){
       `}</style>
 
       <nav style={{borderBottom:"1px solid #e8e6e0"}} className="nk-wrap-nav">
-        <div style={{display:"flex",alignItems:"center",maxWidth:1280,margin:"0 auto",padding:"14px 0 10px"}}>
+        <div style={{display:"flex",alignItems:"center",padding:"14px 0 10px"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginRight:"auto"}}>
             <Logo size={36}/>
             <span className="nk-nav-brand" style={{fontSize:18,fontWeight:700,color:"#2a2a22",letterSpacing:"-0.02em"}}>Нейроключ</span>
