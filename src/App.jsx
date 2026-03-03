@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { isValidPhoneNumber } from "libphonenumber-js";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const ADMIN_PASS = "nk-product3103";
 
