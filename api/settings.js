@@ -1,33 +1,28 @@
-import { Redis } from "@upstash/redis";
+import Redis from "ioredis";
 
-function createRedis() {
-  // If REST API vars exist, use them directly
-  if (process.env.KV_REST_API_URL) {
-    return new Redis({
-      url: process.env.KV_REST_API_URL,
-      token: process.env.KV_REST_API_TOKEN,
+let redis;
+function getRedis() {
+  if (!redis) {
+    redis = new Redis(process.env.KV_REDIS_URL, {
+      maxRetriesPerRequest: 1,
+      lazyConnect: true,
+      tls: {},
     });
   }
-  // Otherwise parse KV_REDIS_URL: rediss://default:TOKEN@HOSTNAME:PORT
-  const redisUrl = process.env.KV_REDIS_URL;
-  if (!redisUrl) throw new Error("No Redis env vars found");
-  const parsed = new URL(redisUrl);
-  return new Redis({
-    url: `https://${parsed.hostname}`,
-    token: parsed.password,
-  });
+  return redis;
 }
 
-const redis = createRedis();
 const KEY = "nk-settings";
 
 export default async function handler(req, res) {
+  const db = getRedis();
+
   // GET — anyone can read settings
   if (req.method === "GET") {
     try {
-      const data = await redis.get(KEY);
-      if (!data) return res.status(200).json(null);
-      return res.status(200).json(data);
+      const raw = await db.get(KEY);
+      if (!raw) return res.status(200).json(null);
+      return res.status(200).json(JSON.parse(raw));
     } catch (e) {
       console.error("Redis GET error:", e);
       return res.status(500).json({ error: "Failed to load settings" });
@@ -47,7 +42,7 @@ export default async function handler(req, res) {
     }
 
     try {
-      await redis.set(KEY, settings);
+      await db.set(KEY, JSON.stringify(settings));
       return res.status(200).json({ ok: true });
     } catch (e) {
       console.error("Redis SET error:", e);
