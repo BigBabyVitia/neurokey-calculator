@@ -1,10 +1,24 @@
 import { Redis } from "@upstash/redis";
 
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL,
-  token: process.env.KV_REST_API_TOKEN,
-});
+function createRedis() {
+  // If REST API vars exist, use them directly
+  if (process.env.KV_REST_API_URL) {
+    return new Redis({
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
+    });
+  }
+  // Otherwise parse KV_REDIS_URL: rediss://default:TOKEN@HOSTNAME:PORT
+  const redisUrl = process.env.KV_REDIS_URL;
+  if (!redisUrl) throw new Error("No Redis env vars found");
+  const parsed = new URL(redisUrl);
+  return new Redis({
+    url: `https://${parsed.hostname}`,
+    token: parsed.password,
+  });
+}
 
+const redis = createRedis();
 const KEY = "nk-settings";
 
 export default async function handler(req, res) {
