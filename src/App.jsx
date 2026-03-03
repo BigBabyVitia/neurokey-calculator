@@ -3,7 +3,7 @@ import { isValidPhoneNumber } from "libphonenumber-js";
 
 const ADMIN_PASS = "nk-product3103";
 
-const DC = { bankCommission: 0.03, openrouterCommission: 0.055, usdRub: 80, creditPriceUsd: 0.01 };
+const DC = { bankCommission: 0.03, openrouterCommission: 0.055, usdRub: 80, creditPriceUsd: 0.01, contactUrl: "https://t.me/Lud_AI" };
 const DM = { "Базовый": 0.80, "Премиум": 0.55, "Ультра": 0.45, "Дизайн": 0.55 };
 const SZ = {
   small:  { l: "Малый",   i: 1000,  o: 300 },
@@ -158,8 +158,8 @@ function Client({mods,cfg,mg,addReq}){
       {(()=>{
         const featured=[1,3,4,6];
         const chips=featured.map(id=>lim.find(m=>m.id===id)).filter(Boolean).map(m=>{
-          const pp=m.ps.medium.pp, unlim=m.ps.medium.pd>=200;
-          return {n:m.n,v:unlim?"∞":"~"+fi(pp),unlim};
+          const pp=m.ps.medium.pp;
+          return {n:m.n,v:"~"+fi(pp)};
         });
         return (
           <div className="nk-chips-wrap" style={{padding:"12px 0 32px",maxWidth:600,marginInline:"auto"}}>
@@ -168,7 +168,7 @@ function Client({mods,cfg,mg,addReq}){
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
                 {chips.map(c=>(
                   <div key={c.n} style={{background:"#fafaf8",borderRadius:8,padding:"8px 12px",display:"flex",alignItems:"baseline",gap:6}}>
-                    <span className="nk-chip-val" style={{fontSize:18,fontWeight:700,color:c.unlim?"#16a34a":"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{c.v}</span>
+                    <span className="nk-chip-val" style={{fontSize:18,fontWeight:700,color:"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{c.v}</span>
                     <span className="nk-chip-name" style={{fontSize:11,color:"#a0a098"}}>{c.n}</span>
                   </div>
                 ))}
@@ -221,12 +221,12 @@ function Client({mods,cfg,mg,addReq}){
               </div>
               <div className="nk-limits-nums" style={{display:"flex",flex:1,gap:8}}>
                 {["small","medium","large"].map(k=>{
-                  const d=m.ps[k],u=d.pd>=200;
+                  const d=m.ps[k];
                   const szLbl={small:"Малых",medium:"Средних",large:"Больших"};
                   return (
                     <div key={k} style={{flex:1,textAlign:"center",padding:"4px 0"}}>
-                      <div className="nk-limits-num-val" style={{fontSize:20,fontWeight:700,color:u?"#16a34a":"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>
-                        {u ? "∞" : fi(d.pp)}
+                      <div className="nk-limits-num-val" style={{fontSize:20,fontWeight:700,color:"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>
+                        {fi(d.pp)}
                       </div>
                       <div className="nk-num-label">{szLbl[k]}</div>
                     </div>
@@ -408,6 +408,14 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
           </div>
         </div>
 
+        <div style={crd}>
+          <div style={crdT}>Контакты</div>
+          <div style={aR}>
+            <span style={aL}>Ссылка сэйлза</span>
+            <input type="url" value={cfg.contactUrl||""} onChange={e=>setCfg({...cfg,contactUrl:e.target.value})} placeholder="https://t.me/..." style={{...aI,width:"auto",flex:1,fontFamily:"'Inter',sans-serif"}}/>
+          </div>
+        </div>
+
         <Crd title="Текстовые модели" action={<button onClick={()=>ad("text")} style={addB}>+ Добавить</button>}>
           <Tbl><THd><Tc>Модель</Tc><Tc>Тир</Tc><Tc r>OpenRouter $/M</Tc><Tc r>Себест. ₽/M</Tc><Tc r>Клиент ₽/M</Tc><Tc r>Маржа</Tc><Tc r>Ср. запрос</Tc><Tc></Tc></THd>
           <tbody>{txt.map(m=>eId===m.id?(
@@ -547,6 +555,9 @@ export default function App(){
         .nk-wrap{max-width:1280px;margin:0 auto;padding:0 48px 60px}
         .nk-wrap-nav{padding:0 48px}
         .nk-num-label{display:none;font-size:10px;color:#b0b0a8;margin-top:2px;text-align:center}
+        .nk-contact-btn{display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s;margin-left:8px;white-space:nowrap}
+        .nk-contact-btn:hover{background:#15803d}
+        .nk-contact-short{display:none}
         @media(max-width:768px){.nk-wrap{padding:0 20px 40px}.nk-wrap-nav{padding:0 20px}.nk-save-bar{margin-inline:-20px !important;padding-inline:20px !important}}
         @media(max-width:600px){
           .nk-hero{padding:32px 0 16px !important}
@@ -574,6 +585,9 @@ export default function App(){
           .nk-nav-brand{display:none !important}
           .nk-nav{font-size:12px !important;padding:6px 8px !important}
           .nk-admin-grid{grid-template-columns:1fr !important}
+          .nk-contact-btn{padding:6px 12px !important;font-size:12px !important;margin-left:4px !important}
+          .nk-contact-full{display:none !important}
+          .nk-contact-short{display:inline !important}
         }
         .nk-nav{background:none;border:none;font-size:13px;padding:8px 14px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s}
         .nk-nav:hover{background:rgba(0,0,0,.05)}
@@ -591,15 +605,18 @@ export default function App(){
             <Logo size={36}/>
             <span className="nk-nav-brand" style={{fontSize:18,fontWeight:700,color:"#2a2a22",letterSpacing:"-0.02em"}}>Нейроключ</span>
           </div>
-          {authed ? (
-            <div style={{display:"flex",alignItems:"center",gap:4}}>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            {authed && <>
               {navBtn("client","Калькулятор")}
               {navBtn("admin","Управление")}
               <button onClick={logout} className="nk-nav nk-nav-idle" style={{fontSize:12,marginLeft:4}}>Выйти</button>
-            </div>
-          ) : (
-            <button className="nk-nav nk-nav-active">Калькулятор</button>
-          )}
+            </>}
+            <a href={cfg.contactUrl} target="_blank" rel="noopener noreferrer" className="nk-contact-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              <span className="nk-contact-full">Связаться с нами</span>
+              <span className="nk-contact-short">Написать</span>
+            </a>
+          </div>
         </div>
       </nav>
 
