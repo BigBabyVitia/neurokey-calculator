@@ -518,7 +518,7 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
 
 /* ── Root ───────────────────────────────────────── */
 export default function App(){
-  const [mods,setMods]=useState(()=>{const s=loadSettings();return s?.mods??DModels;});
+  const [mods,setMods]=useState(()=>{const s=loadSettings();if(!s?.mods)return DModels;return s.mods.map(m=>{const d=DModels.find(dm=>dm.id===m.id);return {...m,desc:m.desc??(d?.desc??"")};});});
   const [cfg,setCfg]=useState(()=>{const s=loadSettings();return s?.cfg??DC;});
   const [mg,setMg]=useState(()=>{const s=loadSettings();return s?.mg??DM;});
   const [reqs,setReqs]=useState(loadReqs);
