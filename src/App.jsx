@@ -23,10 +23,7 @@ const DModels = [
 ];
 const TIERS = ["Базовый","Премиум","Ультра","Дизайн"];
 
-const LS_KEY = "nk-settings";
 const LS_REQS = "nk-reqs";
-function loadSettings(){try{const d=JSON.parse(localStorage.getItem(LS_KEY));return d&&d.mods?d:null;}catch{return null;}}
-function saveSettings(mods,cfg,mg){localStorage.setItem(LS_KEY,JSON.stringify({mods,cfg,mg}));}
 function loadReqs(){try{return JSON.parse(localStorage.getItem(LS_REQS))||[];}catch{return [];}}
 function saveReqs(reqs){localStorage.setItem(LS_REQS,JSON.stringify(reqs));}
 
@@ -326,7 +323,7 @@ function Client({mods,cfg,mg,addReq}){
 }
 
 /* ── Admin ──────────────────────────────────────── */
-function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
+function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,saving}){
   const {pm,txt,im}=useEng(mods,cfg,mg);
   const [eId,setEId]=useState(null);
   const [fm,setFm]=useState({});
@@ -354,7 +351,7 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
             {dirty && <>
               <span style={{fontSize:13,color:"#a0a098",marginRight:"auto"}}>Есть несохранённые изменения</span>
               <button className="nk-reset-btn" onClick={onReset}>Сбросить</button>
-              <button className="nk-save-btn" onClick={()=>{onSave();setSaved(true);setTimeout(()=>setSaved(false),2000);}}>Сохранить</button>
+              <button className="nk-save-btn" disabled={saving} onClick={async()=>{await onSave();setSaved(true);setTimeout(()=>setSaved(false),2000);}} style={saving?{opacity:0.6}:{}}>{saving?"Сохранение...":"Сохранить"}</button>
             </>}
           </div>
         </div>
@@ -517,17 +514,43 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
 
 /* ── Root ───────────────────────────────────────── */
 export default function App(){
-  const [mods,setMods]=useState(()=>{const s=loadSettings();if(!s?.mods)return DModels;return s.mods.map(m=>{const d=DModels.find(dm=>dm.id===m.id);return {...m,desc:m.desc??(d?.desc??"")};});});
-  const [cfg,setCfg]=useState(()=>{const s=loadSettings();return s?.cfg??DC;});
-  const [mg,setMg]=useState(()=>{const s=loadSettings();return s?.mg??DM;});
+  const [mods,setMods]=useState(DModels);
+  const [cfg,setCfg]=useState(DC);
+  const [mg,setMg]=useState(DM);
+  const [settingsLoaded,setSettingsLoaded]=useState(false);
+  const [saving,setSaving]=useState(false);
   const [reqs,setReqs]=useState(loadReqs);
   const addReq=r=>setReqs(p=>{const n=[...p,{...r,id:Date.now(),date:new Date().toLocaleDateString("ru-RU")}];saveReqs(n);return n;});
   const [dirty,setDirty]=useState(false);
   const setModsD=v=>{setMods(v);setDirty(true);};
   const setCfgD=v=>{setCfg(v);setDirty(true);};
   const setMgD=v=>{setMg(v);setDirty(true);};
-  const onSave=()=>{saveSettings(mods,cfg,mg);setDirty(false);};
-  const onReset=()=>{if(!window.confirm("Сбросить все настройки к значениям по умолчанию?"))return;localStorage.removeItem(LS_KEY);setMods(DModels);setCfg(DC);setMg(DM);setDirty(false);};
+
+  // Load settings from server on mount
+  useEffect(()=>{
+    fetch("/api/settings").then(r=>r.json()).then(data=>{
+      if(data&&data.mods){
+        const merged=data.mods.map(m=>{const d=DModels.find(dm=>dm.id===m.id);return {...m,desc:m.desc??(d?.desc??"")};});
+        setMods(merged);
+        setCfg({...DC,...data.cfg});
+        setMg({...DM,...data.mg});
+      }
+      setSettingsLoaded(true);
+    }).catch(()=>setSettingsLoaded(true));
+  },[]);
+
+  const onSave=async()=>{
+    setSaving(true);
+    try{
+      const pw=sessionStorage.getItem("nk-admin-pw")||"";
+      const res=await fetch("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw,settings:{mods,cfg,mg}})});
+      const data=await res.json();
+      if(data.ok)setDirty(false);
+      else alert("Ошибка сохранения: "+((data).error||"Неизвестная ошибка"));
+    }catch(e){alert("Ошибка сети при сохранении");}
+    finally{setSaving(false);}
+  };
+  const onReset=()=>{if(!window.confirm("Сбросить все настройки к значениям по умолчанию?"))return;setMods(DModels);setCfg(DC);setMg(DM);setDirty(true);};
 
   const [authed,setAuthed]=useState(()=>sessionStorage.getItem("nk-admin")==="1");
   const [pg,setPg]=useState(()=>window.location.hash==="#admin"?(sessionStorage.getItem("nk-admin")==="1"?"admin":"login"):"client");
@@ -553,12 +576,12 @@ export default function App(){
     try{
       const res=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})});
       const data=await res.json();
-      if(data.ok){setAuthed(true);sessionStorage.setItem("nk-admin","1");setPg("admin");}
+      if(data.ok){setAuthed(true);sessionStorage.setItem("nk-admin","1");sessionStorage.setItem("nk-admin-pw",pw);setPg("admin");}
       else setPwErr(true);
     }catch(e){console.error("Login error:",e);setPwErr(true);}
     finally{setLoginLoading(false);}
   };
-  const logout=()=>{setAuthed(false);sessionStorage.removeItem("nk-admin");window.location.hash="";setPg("client");};
+  const logout=()=>{setAuthed(false);sessionStorage.removeItem("nk-admin");sessionStorage.removeItem("nk-admin-pw");window.location.hash="";setPg("client");};
 
   const navBtn=(id,label)=>(<button key={id} onClick={()=>{setPg(id);setMenuOpen(false);}} className={`nk-nav ${pg===id?"nk-nav-active":"nk-nav-idle"}`}>{label}</button>);
 
@@ -663,7 +686,7 @@ export default function App(){
           <button onClick={tryLogin} disabled={loginLoading} style={{...gBtn,opacity:loginLoading?0.6:1}}>{loginLoading?"...":"Войти"}</button>
         </div>
       ) : pg==="admin" ? (
-        <Admin mods={mods} setMods={setModsD} cfg={cfg} setCfg={setCfgD} mg={mg} setMg={setMgD} reqs={reqs} onSave={onSave} onReset={onReset} dirty={dirty}/>
+        <Admin mods={mods} setMods={setModsD} cfg={cfg} setCfg={setCfgD} mg={mg} setMg={setMgD} reqs={reqs} onSave={onSave} onReset={onReset} dirty={dirty} saving={saving}/>
       ) : (
         <Client mods={mods} cfg={cfg} mg={mg} addReq={addReq}/>
       )}
