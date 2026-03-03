@@ -11,15 +11,15 @@ const SZ = {
   large:  { l: "Большой", i: 30000, o: 2000 },
 };
 const DModels = [
-  { id:1, n:"DeepSeek v3.2",     t:"Базовый",  i:0.25, o:0.4,  tp:"text" },
-  { id:2, n:"Grok 4.1 Fast",     t:"Базовый",  i:0.2,  o:0.5,  tp:"text" },
-  { id:3, n:"Claude Sonnet 4.6", t:"Премиум",  i:3.0,  o:15.0, tp:"text" },
-  { id:4, n:"GPT-5.2",           t:"Премиум",  i:1.75, o:14.0, tp:"text" },
-  { id:5, n:"Gemini 3 Pro",      t:"Премиум",  i:2.0,  o:12.0, tp:"text" },
-  { id:6, n:"Claude Opus 4.6",   t:"Ультра",   i:5.0,  o:25.0, tp:"text" },
-  { id:7, n:"Seedream 4.5",      t:"Дизайн",   i:0, o:0, tp:"image", p:0.04 },
-  { id:8, n:"Nano Banana Pro",   t:"Дизайн",   i:0, o:0, tp:"image", p:0.134 },
-  { id:9, n:"GPT Image 1.5",     t:"Дизайн",   i:0, o:0, tp:"image", p:0.04 },
+  { id:1, n:"DeepSeek v3.2",     t:"Базовый",  i:0.25, o:0.4,  tp:"text", desc:"Быстрые ответы на простые вопросы. Перевод, справки, рутинные задачи." },
+  { id:2, n:"Grok 4.1 Fast",     t:"Базовый",  i:0.2,  o:0.5,  tp:"text", desc:"Быстрая генерация текста. Идеально для брейнштормов и общих вопросов." },
+  { id:3, n:"Claude Sonnet 4.6", t:"Премиум",  i:3.0,  o:15.0, tp:"text", desc:"Универсальный помощник: документы, код, аналитика, длинные тексты." },
+  { id:4, n:"GPT-5.2",           t:"Премиум",  i:1.75, o:14.0, tp:"text", desc:"Мощная модель для сложных задач: аналитика, тексты, работа с данными." },
+  { id:5, n:"Gemini 3 Pro",      t:"Премиум",  i:2.0,  o:12.0, tp:"text", desc:"Универсальная модель Google. Хорошо работает с большими контекстами." },
+  { id:6, n:"Claude Opus 4.6",   t:"Ультра",   i:5.0,  o:25.0, tp:"text", desc:"Топовая модель для самых сложных задач: глубокий анализ, стратегия, исследования." },
+  { id:7, n:"Seedream 4.5",      t:"Дизайн",   i:0, o:0, tp:"image", p:0.04, desc:"Быстрая генерация изображений высокого качества." },
+  { id:8, n:"Nano Banana Pro",   t:"Дизайн",   i:0, o:0, tp:"image", p:0.134, desc:"Продвинутая генерация изображений с детальной проработкой." },
+  { id:9, n:"GPT Image 1.5",     t:"Дизайн",   i:0, o:0, tp:"image", p:0.04, desc:"Генерация и редактирование изображений от OpenAI." },
 ];
 const TIERS = ["Базовый","Премиум","Ультра","Дизайн"];
 
@@ -216,8 +216,10 @@ function Client({mods,cfg,mg,addReq}){
               background:"#fafaf8",borderRadius:12,padding:"14px 20px",marginBottom:6,
             }}>
               <div className="nk-limits-model" style={{width:220,flexShrink:0}}>
-                <div style={{fontSize:15,fontWeight:600,color:"#1a1a18",marginBottom:3}}>{m.n}</div>
-                <Tag tier={m.t}/>
+                <span className={m.desc?"nk-tooltip":""} data-tip={m.desc||""}>
+                  <div style={{fontSize:15,fontWeight:600,color:"#1a1a18",marginBottom:3}}>{m.n}</div>
+                  <Tag tier={m.t}/>
+                </span>
               </div>
               <div className="nk-limits-nums" style={{display:"flex",flex:1,gap:8}}>
                 {["small","medium","large"].map(k=>{
@@ -252,7 +254,7 @@ function Client({mods,cfg,mg,addReq}){
               <div key={i} style={{flex:"1 1 180px",background:"#fafaf8",borderRadius:12,padding:"16px 20px",textAlign:"center"}}>
                 <div className="nk-img-num" style={{fontSize:26,fontWeight:700,color:"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{fi(m.pp)}</div>
                 <div style={{fontSize:12,color:"#a0a098",marginTop:3}}>картинок на сотрудника</div>
-                <div style={{fontSize:13,fontWeight:500,color:"#5a5a52",marginTop:5}}>{m.n}</div>
+                <span className={m.desc?"nk-tooltip":""} data-tip={m.desc||""}><div style={{fontSize:13,fontWeight:500,color:"#5a5a52",marginTop:5}}>{m.n}</div></span>
               </div>
             ))}
           </div>
@@ -336,7 +338,7 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
   const dl=id=>setMods(p=>p.filter(m=>m.id!==id));
   const ad=tp=>{
     const nid=Math.max(0,...mods.map(m=>m.id))+1;
-    const nm=tp==="text"?{id:nid,n:"Новая модель",t:"Премиум",i:1,o:5,tp:"text"}:{id:nid,n:"Новая модель",t:"Дизайн",i:0,o:0,tp:"image",p:0.05};
+    const nm=tp==="text"?{id:nid,n:"Новая модель",t:"Премиум",i:1,o:5,tp:"text",desc:""}:{id:nid,n:"Новая модель",t:"Дизайн",i:0,o:0,tp:"image",p:0.05,desc:""};
     setMods(p=>[...p,nm]);sE(nm);
   };
   const mix={"Базовый":0.50,"Премиум":0.35,"Ультра":0.15};
@@ -427,12 +429,12 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
               <td style={tdc}><input value={fm.n} onChange={e=>setFm({...fm,n:e.target.value})} style={{...aI,width:130}}/></td>
               <td style={tdc}><select value={fm.t} onChange={e=>setFm({...fm,t:e.target.value})} style={{...aI,width:90}}>{["Базовый","Премиум","Ультра"].map(t=><option key={t}>{t}</option>)}</select></td>
               <td style={{...tdc,textAlign:"right"}}><input type="number" step="0.01" value={fm.i} onChange={e=>setFm({...fm,i:e.target.value})} style={{...aI,width:50}}/><span style={{color:"#d0d0c8"}}> / </span><input type="number" step="0.01" value={fm.o} onChange={e=>setFm({...fm,o:e.target.value})} style={{...aI,width:50}}/></td>
-              <td colSpan={4}></td>
+              <td colSpan={3}><input value={fm.desc||""} onChange={e=>setFm({...fm,desc:e.target.value})} placeholder="Описание для тултипа" style={{...aI,width:"100%",fontFamily:"'Inter',sans-serif"}}/></td>
               <td style={tdc}><div style={{display:"flex",gap:4}}><button onClick={sv} style={svB}>✓</button><button onClick={cE} style={cnB}>✕</button></div></td>
             </tr>
           ):(
             <Rw key={m.id}>
-              <Td b>{m.n}</Td><Td g>{m.t}</Td>
+              <Td b><div>{m.n}</div>{m.desc?<div style={{fontSize:11,fontWeight:400,color:"#b0b0a8",marginTop:2,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.desc}</div>:<div style={{fontSize:11,color:"#ddddd5",marginTop:2,fontStyle:"italic"}}>Нет описания</div>}</Td><Td g>{m.t}</Td>
               <Td r mn>${m.i} / ${m.o}</Td>
               <Td r mn><G>{f(m.bI*cfg.usdRub,1)} / {f(m.bO*cfg.usdRub,0)}</G></Td>
               <Td r mn>{f(m.sIR,1)} / {f(m.sOR,0)}</Td>
@@ -565,6 +567,9 @@ export default function App(){
         .nk-contact-short{display:none}
         .nk-burger{display:none}
         .nk-nav-menu{display:flex;align-items:center;gap:4px}
+        .nk-tooltip{position:relative;cursor:help}
+        .nk-tooltip::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 6px);background:#1a1a18;color:#fff;font-size:12px;font-weight:400;line-height:1.4;padding:8px 12px;border-radius:8px;white-space:normal;width:240px;opacity:0;visibility:hidden;transition:opacity .15s;z-index:100;pointer-events:none}
+        .nk-tooltip:hover::after{opacity:1;visibility:visible}
         @media(max-width:768px){.nk-wrap{padding:0 20px 40px}.nk-wrap-nav{padding:14px 20px 10px}.nk-save-bar{margin-inline:-20px !important;padding-inline:20px !important}}
         @media(max-width:600px){
           .nk-hero{padding:32px 0 16px !important}
