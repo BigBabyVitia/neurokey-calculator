@@ -33,8 +33,8 @@ function saveReqs(reqs){localStorage.setItem(LS_REQS,JSON.stringify(reqs));}
 const f=(n,d=2)=>{if(n>=1000)return Math.round(n).toLocaleString("ru-RU");if(n>=100)return n.toFixed(1);if(n>=10)return n.toFixed(d);if(n>=1)return n.toFixed(d);return n.toFixed(Math.max(d,3));};
 const fi=n=>Math.floor(n).toLocaleString("ru-RU");
 
-function NumIn({value,onChange,style:s={}}){
-  return <input type="text" inputMode="numeric" value={Number(value).toLocaleString("ru-RU")} onChange={e=>onChange(parseInt(e.target.value.replace(/\D/g,""))||0)} style={s}/>;
+function NumIn({value,onChange,style:s={},className}){
+  return <input type="text" inputMode="numeric" className={className} value={Number(value).toLocaleString("ru-RU")} onChange={e=>onChange(parseInt(e.target.value.replace(/\D/g,""))||0)} style={s}/>;
 }
 
 function useEng(mods,cfg,mg){
@@ -141,16 +141,16 @@ function Client({mods,cfg,mg,addReq}){
   return (
     <div>
       {/* Hero */}
-      <div style={{padding:"48px 0 20px",maxWidth:540,marginInline:"auto",textAlign:"center"}}>
-        <h1 style={{fontSize:28,fontWeight:700,margin:"0 0 6px",color:"#1a1a18",letterSpacing:"-0.03em",lineHeight:1.25}}>
+      <div className="nk-hero" style={{padding:"56px 0 24px",maxWidth:720,marginInline:"auto",textAlign:"center"}}>
+        <h1 className="nk-hero-title" style={{fontSize:36,fontWeight:700,margin:"0 0 8px",color:"#1a1a18",letterSpacing:"-0.03em",lineHeight:1.2}}>
           Единый доступ к нейросетям в вашей корпоративной среде
         </h1>
-        <p style={{fontSize:15,color:"#8a8a82",margin:"0 0 32px"}}>
+        <p className="nk-hero-sub" style={{fontSize:17,color:"#8a8a82",margin:"0 0 36px"}}>
           Рассчитайте, сколько получит каждый сотрудник
         </p>
-        <div style={{display:"flex",gap:12}}>
-          <div style={{flex:1,textAlign:"left"}}><label style={lbl}>Бюджет, ₽</label><NumIn value={bud} onChange={setBud} style={mInp}/></div>
-          <div style={{flex:1,textAlign:"left"}}><label style={lbl}>Сотрудников</label><NumIn value={emp} onChange={v=>setEmp(Math.max(1,v))} style={mInp}/></div>
+        <div className="nk-hero-inputs" style={{display:"flex",gap:16,maxWidth:560,marginInline:"auto"}}>
+          <div style={{flex:1,textAlign:"left"}}><label style={lbl}>Бюджет, ₽</label><NumIn value={bud} onChange={setBud} style={mInp} className="nk-main-input"/></div>
+          <div style={{flex:1,textAlign:"left"}}><label style={lbl}>Сотрудников</label><NumIn value={emp} onChange={v=>setEmp(Math.max(1,v))} style={mInp} className="nk-main-input"/></div>
         </div>
       </div>
 
@@ -162,14 +162,14 @@ function Client({mods,cfg,mg,addReq}){
           return {n:m.n,v:unlim?"∞":"~"+fi(pp),unlim};
         });
         return (
-          <div style={{padding:"12px 0 28px",maxWidth:540,marginInline:"auto"}}>
-            <div style={{background:"#fff",borderRadius:12,padding:"14px 20px"}}>
+          <div className="nk-chips-wrap" style={{padding:"12px 0 32px",maxWidth:600,marginInline:"auto"}}>
+            <div className="nk-chips-card" style={{background:"#fff",borderRadius:12,padding:"14px 20px"}}>
               <div style={{fontSize:12,color:"#a0a098",marginBottom:8}}>Средних запросов на сотрудника</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
                 {chips.map(c=>(
                   <div key={c.n} style={{background:"#fafaf8",borderRadius:8,padding:"8px 12px",display:"flex",alignItems:"baseline",gap:6}}>
-                    <span style={{fontSize:18,fontWeight:700,color:c.unlim?"#16a34a":"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{c.v}</span>
-                    <span style={{fontSize:11,color:"#a0a098"}}>{c.n}</span>
+                    <span className="nk-chip-val" style={{fontSize:18,fontWeight:700,color:c.unlim?"#16a34a":"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{c.v}</span>
+                    <span className="nk-chip-name" style={{fontSize:11,color:"#a0a098"}}>{c.n}</span>
                   </div>
                 ))}
               </div>
@@ -179,31 +179,31 @@ function Client({mods,cfg,mg,addReq}){
       })()}
 
       {/* Size explainer cards */}
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
+      <div className="nk-size-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:24}}>
         <div style={sizeCard}>
-          <div style={{fontSize:13,fontWeight:600,color:"#3a3a32",marginBottom:4}}>Малый запрос</div>
-          <div style={{fontSize:12,color:"#8a8a82",lineHeight:1.5}}>Короткий вопрос — ответ в пару абзацев. Перевод фразы, быстрая справка, генерация идеи.</div>
+          <div style={{fontSize:14,fontWeight:600,color:"#3a3a32",marginBottom:4}}>Малый запрос</div>
+          <div style={{fontSize:13,color:"#8a8a82",lineHeight:1.5}}>Короткий вопрос — ответ в пару абзацев. Перевод фразы, быстрая справка, генерация идеи.</div>
         </div>
         <div style={sizeCard}>
-          <div style={{fontSize:13,fontWeight:600,color:"#3a3a32",marginBottom:4}}>Средний запрос</div>
-          <div style={{fontSize:12,color:"#8a8a82",lineHeight:1.5}}>Работа с документом 3–15 страниц. Написание письма, анализ отчёта, суммаризация встречи.</div>
+          <div style={{fontSize:14,fontWeight:600,color:"#3a3a32",marginBottom:4}}>Средний запрос</div>
+          <div style={{fontSize:13,color:"#8a8a82",lineHeight:1.5}}>Работа с документом 3–15 страниц. Написание письма, анализ отчёта, суммаризация встречи.</div>
         </div>
         <div style={sizeCard}>
-          <div style={{fontSize:13,fontWeight:600,color:"#3a3a32",marginBottom:4}}>Большой запрос</div>
-          <div style={{fontSize:12,color:"#8a8a82",lineHeight:1.5}}>Анализ большого текста от 15 страниц. Разбор договора, ревью кодовой базы, исследование.</div>
+          <div style={{fontSize:14,fontWeight:600,color:"#3a3a32",marginBottom:4}}>Большой запрос</div>
+          <div style={{fontSize:13,color:"#8a8a82",lineHeight:1.5}}>Анализ большого текста от 15 страниц. Разбор договора, ревью кодовой базы, исследование.</div>
         </div>
       </div>
 
       {/* Limits table — main value block */}
-      <div style={{background:"#fff",borderRadius:14,padding:"20px 22px",marginBottom:16}}>
-        <div style={{fontSize:16,fontWeight:700,color:"#1a1a18",marginBottom:2}}>Выберите одну из моделей</div>
-        <div style={{fontSize:13,color:"#a0a098",marginBottom:16}}>На ваш бюджет каждый сотрудник сможет сделать столько запросов</div>
+      <div className="nk-limits-card" style={{background:"#fff",borderRadius:16,padding:"28px 32px",marginBottom:20}}>
+        <div className="nk-limits-title" style={{fontSize:18,fontWeight:700,color:"#1a1a18",marginBottom:2}}>Выберите одну из моделей</div>
+        <div className="nk-limits-sub" style={{fontSize:14,color:"#a0a098",marginBottom:20}}>На ваш бюджет каждый сотрудник сможет сделать столько запросов</div>
 
         <div style={{display:"flex",flexDirection:"column",gap:0}}>
           {/* Header row */}
-          <div style={{display:"flex",alignItems:"center",gap:12,padding:"0 16px 8px"}}>
-            <div style={{width:180,flexShrink:0,fontSize:11,fontWeight:500,color:"#b0b0a8",textTransform:"uppercase",letterSpacing:"0.03em"}}>Модель</div>
-            <div style={{display:"flex",flex:1,gap:6}}>
+          <div className="nk-limits-header" style={{display:"flex",alignItems:"center",gap:16,padding:"0 20px 10px"}}>
+            <div style={{width:220,flexShrink:0,fontSize:11,fontWeight:500,color:"#b0b0a8",textTransform:"uppercase",letterSpacing:"0.03em"}}>Модель</div>
+            <div style={{display:"flex",flex:1,gap:8}}>
               {["Малых","Средних","Больших"].map(h=>(
                 <div key={h} style={{flex:1,textAlign:"center",fontSize:11,fontWeight:500,color:"#b0b0a8",textTransform:"uppercase",letterSpacing:"0.03em"}}>{h}</div>
               ))}
@@ -211,22 +211,24 @@ function Client({mods,cfg,mg,addReq}){
           </div>
           {/* Rows */}
           {lim.map((m,i)=>(
-            <div key={i} style={{
-              display:"flex",alignItems:"center",gap:12,
-              background:"#fafaf8",borderRadius:10,padding:"12px 16px",marginBottom:6,
+            <div key={i} className="nk-limits-row" style={{
+              display:"flex",alignItems:"center",gap:16,
+              background:"#fafaf8",borderRadius:12,padding:"14px 20px",marginBottom:6,
             }}>
-              <div style={{width:180,flexShrink:0}}>
-                <div style={{fontSize:14,fontWeight:600,color:"#1a1a18",marginBottom:3}}>{m.n}</div>
+              <div className="nk-limits-model" style={{width:220,flexShrink:0}}>
+                <div style={{fontSize:15,fontWeight:600,color:"#1a1a18",marginBottom:3}}>{m.n}</div>
                 <Tag tier={m.t}/>
               </div>
-              <div style={{display:"flex",flex:1,gap:6}}>
+              <div className="nk-limits-nums" style={{display:"flex",flex:1,gap:8}}>
                 {["small","medium","large"].map(k=>{
                   const d=m.ps[k],u=d.pd>=200;
+                  const szLbl={small:"Малых",medium:"Средних",large:"Больших"};
                   return (
                     <div key={k} style={{flex:1,textAlign:"center",padding:"4px 0"}}>
-                      <div style={{fontSize:18,fontWeight:700,color:u?"#16a34a":"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>
+                      <div className="nk-limits-num-val" style={{fontSize:20,fontWeight:700,color:u?"#16a34a":"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>
                         {u ? "∞" : fi(d.pp)}
                       </div>
+                      <div className="nk-num-label">{szLbl[k]}</div>
                     </div>
                   );
                 })}
@@ -243,14 +245,14 @@ function Client({mods,cfg,mg,addReq}){
 
       {/* Images */}
       {imgL.length>0 && (
-        <div style={{background:"#fff",borderRadius:14,padding:"18px 20px",marginBottom:16}}>
-          <div style={{fontSize:14,fontWeight:600,color:"#1a1a18",marginBottom:12}}>Генерация изображений</div>
-          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        <div className="nk-img-card" style={{background:"#fff",borderRadius:16,padding:"24px 32px",marginBottom:20}}>
+          <div style={{fontSize:16,fontWeight:600,color:"#1a1a18",marginBottom:14}}>Генерация изображений</div>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
             {imgL.map((m,i)=>(
-              <div key={i} style={{flex:"1 1 140px",background:"#fafaf8",borderRadius:10,padding:"12px 16px",textAlign:"center"}}>
-                <div style={{fontSize:22,fontWeight:700,color:"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{fi(m.pp)}</div>
-                <div style={{fontSize:11,color:"#a0a098",marginTop:2}}>картинок на сотрудника</div>
-                <div style={{fontSize:12,fontWeight:500,color:"#5a5a52",marginTop:4}}>{m.n}</div>
+              <div key={i} style={{flex:"1 1 180px",background:"#fafaf8",borderRadius:12,padding:"16px 20px",textAlign:"center"}}>
+                <div className="nk-img-num" style={{fontSize:26,fontWeight:700,color:"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{fi(m.pp)}</div>
+                <div style={{fontSize:12,color:"#a0a098",marginTop:3}}>картинок на сотрудника</div>
+                <div style={{fontSize:13,fontWeight:500,color:"#5a5a52",marginTop:5}}>{m.n}</div>
               </div>
             ))}
           </div>
@@ -259,7 +261,7 @@ function Client({mods,cfg,mg,addReq}){
 
       {/* Prices — collapsed */}
       <button onClick={()=>setShowPrices(!showPrices)} style={{
-        ...linkBtn,fontSize:13,marginBottom:showPrices?0:16,padding:"8px 0",display:"block",
+        ...linkBtn,fontSize:14,marginBottom:showPrices?0:20,padding:"10px 0",display:"block",
       }}>
         {showPrices ? "Скрыть детализацию цен ↑" : "Подробнее о ценах →"}
       </button>
@@ -278,7 +280,7 @@ function Client({mods,cfg,mg,addReq}){
       )}
 
       {/* Request model */}
-      <div style={{borderRadius:14,padding:"20px 24px",background:"#fff",marginBottom:16}}>
+      <div className="nk-req-card" style={{borderRadius:16,padding:"24px 32px",background:"#fff",marginBottom:20}}>
         {!showReq && !reqSent && (
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <div>
@@ -344,7 +346,7 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
     <div>
       {/* Sticky save bar */}
       {(dirty||saved) && (
-        <div style={{position:"sticky",top:0,zIndex:10,background:"#F5F4F0",padding:"12px 0",borderBottom:"1px solid #e8e6e0",marginInline:-24,paddingInline:24}}>
+        <div className="nk-save-bar" style={{position:"sticky",top:0,zIndex:10,background:"#F5F4F0",padding:"12px 0",borderBottom:"1px solid #e8e6e0",marginInline:-48,paddingInline:48}}>
           <div style={{display:"flex",alignItems:"center",gap:10,justifyContent:"flex-end"}}>
             {saved && <span style={{fontSize:13,color:"#16a34a",fontWeight:500}}>✓ Сохранено</span>}
             {dirty && <>
@@ -380,7 +382,7 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty}){
       </div>
 
       {adminTab==="settings" && <>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+        <div className="nk-admin-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
           <div style={crd}>
             <div style={crdT}>Константы</div>
             {[{k:"bankCommission",l:"Комиссия банка",s:"%",m:100},{k:"openrouterCommission",l:"OpenRouter",s:"%",m:100},{k:"usdRub",l:"Курс USD/RUB",s:"₽"},{k:"creditPriceUsd",l:"1 кредит",s:"$"}].map(({k,l,s,m})=>(
@@ -537,11 +539,42 @@ export default function App(){
   const navBtn=(id,label)=>(<button key={id} onClick={()=>setPg(id)} className={`nk-nav ${pg===id?"nk-nav-active":"nk-nav-idle"}`}>{label}</button>);
 
   return (
-    <div style={{fontFamily:"'Inter',-apple-system,sans-serif",background:"#F5F4F0",color:"#3a3a32",minHeight:"100vh",maxWidth:1040,margin:"0 auto",padding:"0 24px 60px"}}>
+    <div style={{fontFamily:"'Inter',-apple-system,sans-serif",background:"#F5F4F0",color:"#3a3a32",minHeight:"100vh"}}>
       <style>{`
         *{box-sizing:border-box}input,select,textarea{outline:none;font-family:inherit}
         input[type=number]{-moz-appearance:textfield}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
         table{border-collapse:collapse;width:100%}
+        .nk-wrap{max-width:1280px;margin:0 auto;padding:0 48px 60px}
+        .nk-wrap-nav{padding:0 48px}
+        .nk-num-label{display:none;font-size:10px;color:#b0b0a8;margin-top:2px;text-align:center}
+        @media(max-width:768px){.nk-wrap{padding:0 20px 40px}.nk-wrap-nav{padding:0 20px}.nk-save-bar{margin-inline:-20px !important;padding-inline:20px !important}}
+        @media(max-width:600px){
+          .nk-hero{padding:32px 0 16px !important}
+          .nk-hero-title{font-size:22px !important;line-height:1.25 !important}
+          .nk-hero-sub{font-size:14px !important;margin-bottom:24px !important}
+          .nk-hero-inputs{flex-direction:column !important;gap:10px !important;max-width:100% !important}
+          .nk-main-input{font-size:18px !important;padding:12px 14px !important}
+          .nk-size-grid{grid-template-columns:1fr !important;gap:8px !important}
+          .nk-limits-card{padding:16px !important;border-radius:12px !important}
+          .nk-limits-header{display:none !important}
+          .nk-limits-row{flex-direction:column !important;align-items:stretch !important;gap:8px !important;padding:12px 14px !important}
+          .nk-limits-model{width:100% !important}
+          .nk-limits-nums{gap:4px !important}
+          .nk-num-label{display:block !important}
+          .nk-limits-num-val{font-size:17px !important}
+          .nk-img-card{padding:16px !important;border-radius:12px !important}
+          .nk-img-num{font-size:22px !important}
+          .nk-req-card{padding:16px !important;border-radius:12px !important}
+          .nk-chips-wrap{padding:8px 0 20px !important;max-width:100% !important}
+          .nk-chips-card{padding:10px 14px !important}
+          .nk-chip-val{font-size:15px !important}
+          .nk-chip-name{font-size:10px !important}
+          .nk-limits-title{font-size:16px !important}
+          .nk-limits-sub{font-size:13px !important}
+          .nk-nav-brand{display:none !important}
+          .nk-nav{font-size:12px !important;padding:6px 8px !important}
+          .nk-admin-grid{grid-template-columns:1fr !important}
+        }
         .nk-nav{background:none;border:none;font-size:13px;padding:8px 14px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s}
         .nk-nav:hover{background:rgba(0,0,0,.05)}
         .nk-nav-active{font-weight:600;color:#2a2a22}
@@ -552,22 +585,25 @@ export default function App(){
         .nk-reset-btn:hover{background:rgba(239,68,68,.08);color:#ef4444}
       `}</style>
 
-      <nav style={{display:"flex",alignItems:"center",borderBottom:"1px solid #e8e6e0",padding:"14px 0 10px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginRight:"auto"}}>
-          <Logo size={34}/>
-          <span style={{fontSize:17,fontWeight:700,color:"#2a2a22",letterSpacing:"-0.02em"}}>Нейроключ</span>
-        </div>
-        {authed ? (
-          <div style={{display:"flex",alignItems:"center",gap:4}}>
-            {navBtn("client","Калькулятор")}
-            {navBtn("admin","Управление")}
-            <button onClick={logout} className="nk-nav nk-nav-idle" style={{fontSize:12,marginLeft:4}}>Выйти</button>
+      <nav style={{borderBottom:"1px solid #e8e6e0"}} className="nk-wrap-nav">
+        <div style={{display:"flex",alignItems:"center",maxWidth:1280,margin:"0 auto",padding:"14px 0 10px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginRight:"auto"}}>
+            <Logo size={36}/>
+            <span className="nk-nav-brand" style={{fontSize:18,fontWeight:700,color:"#2a2a22",letterSpacing:"-0.02em"}}>Нейроключ</span>
           </div>
-        ) : (
-          <button className="nk-nav nk-nav-active">Калькулятор</button>
-        )}
+          {authed ? (
+            <div style={{display:"flex",alignItems:"center",gap:4}}>
+              {navBtn("client","Калькулятор")}
+              {navBtn("admin","Управление")}
+              <button onClick={logout} className="nk-nav nk-nav-idle" style={{fontSize:12,marginLeft:4}}>Выйти</button>
+            </div>
+          ) : (
+            <button className="nk-nav nk-nav-active">Калькулятор</button>
+          )}
+        </div>
       </nav>
 
+      <div className="nk-wrap">
       {pg==="login" ? (
         <div style={{maxWidth:340,margin:"120px auto",textAlign:"center"}}>
           <div style={{fontSize:18,fontWeight:600,color:"#1a1a18",marginBottom:4}}>Управление</div>
@@ -584,14 +620,15 @@ export default function App(){
       ) : (
         <Client mods={mods} cfg={cfg} mg={mg} addReq={addReq}/>
       )}
+      </div>
     </div>
   );
 }
 
 /* ── Styles ─────────────────────────────────────── */
 const lbl={display:"block",fontSize:12,color:"#a0a098",marginBottom:4,fontWeight:500};
-const mInp={width:"100%",padding:"12px 16px",fontSize:22,fontWeight:600,fontFamily:"'Inter',sans-serif",border:"none",borderRadius:12,background:"#fff",color:"#1a1a18"};
-const sizeCard={background:"#fff",borderRadius:12,padding:"14px 18px"};
+const mInp={width:"100%",padding:"14px 18px",fontSize:24,fontWeight:600,fontFamily:"'Inter',sans-serif",border:"none",borderRadius:12,background:"#fff",color:"#1a1a18"};
+const sizeCard={background:"#fff",borderRadius:14,padding:"16px 20px"};
 const crd={background:"#fff",borderRadius:14,padding:"18px 22px",marginBottom:16};
 const crdT={fontSize:11,fontWeight:600,color:"#b0b0a8",marginBottom:10,textTransform:"uppercase",letterSpacing:"0.04em"};
 const aR={display:"flex",alignItems:"center",gap:8,marginBottom:5};
