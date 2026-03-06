@@ -3,7 +3,7 @@ import { isValidPhoneNumber } from "libphonenumber-js";
 import { Analytics } from "@vercel/analytics/react";
 
 
-const DC = { bankCommission: 0.03, openrouterCommission: 0.055, usdRub: 80, creditPriceUsd: 0.01, contactUrl: "https://t.me/Lud_AI" };
+const DC = { bankCommission: 0.03, openrouterCommission: 0.055, usdRub: 80, creditPriceUsd: 0.01, contactUrl: "https://t.me/Lud_AI", pricingMode: "openrouter" };
 const DM = { "Базовый": 0.80, "Премиум": 0.55, "Ультра": 0.45, "Дизайн": 0.55 };
 const SZ = {
   small:  { l: "Малый",   i: 1000,  o: 300 },
@@ -11,15 +11,15 @@ const SZ = {
   large:  { l: "Большой", i: 30000, o: 2000 },
 };
 const DModels = [
-  { id:1, n:"DeepSeek v3.2",     t:"Базовый",  i:0.25, o:0.4,  tp:"text", desc:"Быстрые ответы на каждый день. Переводы, справки, простой код и рутинные рабочие задачи — при самой низкой стоимости запроса." },
-  { id:2, n:"Grok 4.1 Fast",     t:"Базовый",  i:0.2,  o:0.5,  tp:"text", desc:"Быстрая и креативная модель от xAI. Хороша для генерации идей, написания текстов и повседневного общения." },
-  { id:3, n:"Claude Sonnet 4.6", t:"Премиум",  i:3.0,  o:15.0, tp:"text", desc:"Универсальный помощник от Anthropic. Отлично пишет код, анализирует документы, готовит отчёты и работает с большими текстами." },
-  { id:4, n:"GPT-5.2",           t:"Премиум",  i:1.75, o:14.0, tp:"text", desc:"Флагманская модель OpenAI. Подходит для аналитики, написания текстов, создания презентаций и работы с данными." },
-  { id:5, n:"Gemini 3 Pro",      t:"Премиум",  i:2.0,  o:12.0, tp:"text", desc:"Модель Google, которая понимает текст, изображения, аудио и видео. Отличный выбор для анализа файлов разных форматов." },
-  { id:6, n:"Claude Opus 4.6",   t:"Ультра",   i:5.0,  o:25.0, tp:"text", desc:"Самая мощная модель для самых сложных задач. Глубокий анализ, стратегия, исследования и масштабная работа с кодом." },
-  { id:7, n:"Seedream 4.5",      t:"Дизайн",   i:0, o:0, tp:"image", p:0.04, desc:"Быстрая генерация картинок от ByteDance. Хорошо рисует текст на изображениях и подходит для маркетинговых материалов." },
-  { id:8, n:"Nano Banana Pro",   t:"Дизайн",   i:0, o:0, tp:"image", p:0.134, desc:"Продвинутая модель от Google с высокой детализацией. Лучший выбор, когда нужно максимальное качество и точность изображения." },
-  { id:9, n:"GPT Image 1.5",     t:"Дизайн",   i:0, o:0, tp:"image", p:0.04, desc:"Модель OpenAI для создания и редактирования картинок. Быстро генерирует, точно вносит правки и сохраняет детали оригинала." },
+  { id:1, n:"DeepSeek v3.2",     t:"Базовый",  i:0.25, o:0.4,  di:0.28, do_:0.42, tp:"text", desc:"Быстрые ответы на каждый день. Переводы, справки, простой код и рутинные рабочие задачи — при самой низкой стоимости запроса." },
+  { id:2, n:"Grok 4.1 Fast",     t:"Базовый",  i:0.2,  o:0.5,  di:0.2,  do_:0.5,  tp:"text", desc:"Быстрая и креативная модель от xAI. Хороша для генерации идей, написания текстов и повседневного общения." },
+  { id:3, n:"Claude Sonnet 4.6", t:"Премиум",  i:3.0,  o:15.0, di:3.0,  do_:15.0, tp:"text", desc:"Универсальный помощник от Anthropic. Отлично пишет код, анализирует документы, готовит отчёты и работает с большими текстами." },
+  { id:4, n:"GPT-5.2",           t:"Премиум",  i:1.75, o:14.0, di:1.75, do_:14.0, tp:"text", desc:"Флагманская модель OpenAI. Подходит для аналитики, написания текстов, создания презентаций и работы с данными." },
+  { id:5, n:"Gemini 3 Pro",      t:"Премиум",  i:2.0,  o:12.0, di:2.0,  do_:12.0, tp:"text", desc:"Модель Google, которая понимает текст, изображения, аудио и видео. Отличный выбор для анализа файлов разных форматов." },
+  { id:6, n:"Claude Opus 4.6",   t:"Ультра",   i:5.0,  o:25.0, di:5.0,  do_:25.0, tp:"text", desc:"Самая мощная модель для самых сложных задач. Глубокий анализ, стратегия, исследования и масштабная работа с кодом." },
+  { id:7, n:"Seedream 4.5",      t:"Дизайн",   i:0, o:0, tp:"image", p:0.04,  dp:0.04,  desc:"Быстрая генерация картинок от ByteDance. Хорошо рисует текст на изображениях и подходит для маркетинговых материалов." },
+  { id:8, n:"Nano Banana Pro",   t:"Дизайн",   i:0, o:0, tp:"image", p:0.134, dp:0.134, desc:"Продвинутая модель от Google с высокой детализацией. Лучший выбор, когда нужно максимальное качество и точность изображения." },
+  { id:9, n:"GPT Image 1.5",     t:"Дизайн",   i:0, o:0, tp:"image", p:0.04,  dp:0.04,  desc:"Модель OpenAI для создания и редактирования картинок. Быстро генерирует, точно вносит правки и сохраняет детали оригинала." },
 ];
 const TIERS = ["Базовый","Премиум","Ультра","Дизайн"];
 
@@ -34,17 +34,21 @@ function NumIn({value,onChange,style:s={},className}){
   return <input type="text" inputMode="numeric" className={className} value={Number(value).toLocaleString("ru-RU")} onChange={e=>onChange(parseInt(e.target.value.replace(/\D/g,""))||0)} style={s}/>;
 }
 
-function useEng(mods,cfg,mg){
-  const pm=1+cfg.bankCommission+cfg.openrouterCommission;
+function useEng(mods,cfg,mg,modeOverride){
+  const mode=modeOverride||cfg.pricingMode||"openrouter";
+  const isDirect=mode==="direct";
+  const pm=1+cfg.bankCommission+(isDirect?0:cfg.openrouterCommission);
   const txt=useMemo(()=>mods.filter(m=>m.tp==="text").map(m=>{
-    const mr=mg[m.t]||0.5,sm=1/(1-mr),bI=m.i*pm,bO=m.o*pm,sI=bI*sm,sO=bO*sm;
+    const inP=isDirect?(m.di??m.i):m.i, outP=isDirect?(m.do_??m.o):m.o;
+    const mr=mg[m.t]||0.5,sm=1/(1-mr),bI=inP*pm,bO=outP*pm,sI=bI*sm,sO=bO*sm;
     const sz={};Object.entries(SZ).forEach(([k,s])=>{const cc=(sI*s.i+sO*s.o)/1e6;sz[k]={ccR:cc*cfg.usdRub,cr:cc/cfg.creditPriceUsd};});
     return {...m,mr,sm,bI,bO,sI,sO,sIR:sI*cfg.usdRub,sOR:sO*cfg.usdRub,sz};
-  }),[mods,cfg,mg,pm]);
+  }),[mods,cfg,mg,pm,isDirect]);
   const im=useMemo(()=>mods.filter(m=>m.tp==="image").map(m=>{
-    const mr=mg["Дизайн"]||0.55,sm=1/(1-mr),b=(m.p||0)*pm,s=b*sm;
+    const imgP=isDirect?(m.dp??m.p):(m.p||0);
+    const mr=mg["Дизайн"]||0.55,sm=1/(1-mr),b=imgP*pm,s=b*sm;
     return {...m,mr,sm,b,s,bR:b*cfg.usdRub,sR:s*cfg.usdRub,cr:s/cfg.creditPriceUsd};
-  }),[mods,cfg,mg,pm]);
+  }),[mods,cfg,mg,pm,isDirect]);
   return {pm,txt,im};
 }
 
@@ -324,18 +328,26 @@ function Client({mods,cfg,mg,addReq}){
 
 /* ── Admin ──────────────────────────────────────── */
 function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,saving}){
-  const {pm,txt,im}=useEng(mods,cfg,mg);
+  const [priceTab,setPriceTab]=useState(cfg.pricingMode||"openrouter");
+  const {pm,txt,im}=useEng(mods,cfg,mg,priceTab);
   const [eId,setEId]=useState(null);
   const [fm,setFm]=useState({});
   const [saved,setSaved]=useState(false);
   const [adminTab,setAdminTab]=useState("settings");
   const sE=m=>{setEId(m.id);setFm({...m});};
   const cE=()=>{setEId(null);setFm({});};
-  const sv=()=>{setMods(p=>p.map(m=>m.id===eId?{...m,...fm,i:+fm.i||0,o:+fm.o||0,p:+fm.p||0}:m));cE();};
+  const sv=()=>{
+    if(priceTab==="openrouter"){
+      setMods(p=>p.map(m=>m.id===eId?{...m,...fm,i:+fm.i||0,o:+fm.o||0,p:+fm.p||0}:m));
+    }else{
+      setMods(p=>p.map(m=>m.id===eId?{...m,...fm,di:+fm.di||0,do_:+fm.do_||0,dp:+fm.dp||0}:m));
+    }
+    cE();
+  };
   const dl=id=>setMods(p=>p.filter(m=>m.id!==id));
   const ad=tp=>{
     const nid=Math.max(0,...mods.map(m=>m.id))+1;
-    const nm=tp==="text"?{id:nid,n:"Новая модель",t:"Премиум",i:1,o:5,tp:"text",desc:""}:{id:nid,n:"Новая модель",t:"Дизайн",i:0,o:0,tp:"image",p:0.05,desc:""};
+    const nm=tp==="text"?{id:nid,n:"Новая модель",t:"Премиум",i:1,o:5,di:1,do_:5,tp:"text",desc:""}:{id:nid,n:"Новая модель",t:"Дизайн",i:0,o:0,tp:"image",p:0.05,dp:0.05,desc:""};
     setMods(p=>[...p,nm]);sE(nm);
   };
   const mix={"Базовый":0.50,"Премиум":0.35,"Ультра":0.15};
@@ -381,10 +393,25 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
       </div>
 
       {adminTab==="settings" && <>
+        {/* Pricing mode toggle — one toggle controls everything */}
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+          <span style={{fontSize:13,fontWeight:500,color:"#8a8a82"}}>Источник цен:</span>
+          <div style={{display:"flex",gap:2,background:"#F5F4F0",borderRadius:10,padding:3}}>
+            {[{v:"openrouter",l:"OpenRouter"},{v:"direct",l:"Прямое API"}].map(({v,l})=>(
+              <button key={v} onClick={()=>{setPriceTab(v);setCfg(c=>({...c,pricingMode:v}));cE();}} style={{
+                border:"none",padding:"7px 20px",borderRadius:8,fontSize:13,fontWeight:priceTab===v?600:400,
+                cursor:"pointer",background:priceTab===v?"#fff":"transparent",
+                color:priceTab===v?"#1a1a18":"#b0b0a8",
+                boxShadow:priceTab===v?"0 1px 3px rgba(0,0,0,.06)":"none",
+              }}>{l}</button>
+            ))}
+          </div>
+        </div>
+
         <div className="nk-admin-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
           <div style={crd}>
             <div style={crdT}>Константы</div>
-            {[{k:"bankCommission",l:"Комиссия банка",s:"%",m:100},{k:"openrouterCommission",l:"OpenRouter",s:"%",m:100},{k:"usdRub",l:"Курс USD/RUB",s:"₽"},{k:"creditPriceUsd",l:"1 кредит",s:"$"}].map(({k,l,s,m})=>(
+            {[{k:"bankCommission",l:"Комиссия банка",s:"%",m:100},{k:"openrouterCommission",l:"OpenRouter",s:"%",m:100},{k:"usdRub",l:"Курс USD/RUB",s:"₽"},{k:"creditPriceUsd",l:"1 кредит",s:"$"}].filter(({k})=>priceTab==="openrouter"||k!=="openrouterCommission").map(({k,l,s,m})=>(
               <div key={k} style={aR}>
                 <span style={aL}>{l}</span>
                 <input type="number" step="any" value={m?+(cfg[k]*m).toFixed(2):cfg[k]} onChange={e=>setCfg({...cfg,[k]:m?(+e.target.value||0)/m:+e.target.value||0})} style={aI}/>
@@ -420,19 +447,23 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
         </div>
 
         <Crd title="Текстовые модели" action={<button onClick={()=>ad("text")} style={addB}>+ Добавить</button>}>
-          <Tbl><THd><Tc>Модель</Tc><Tc>Тир</Tc><Tc r>OpenRouter $/M</Tc><Tc r>Себест. ₽/M</Tc><Tc r>Клиент ₽/M</Tc><Tc r>Маржа</Tc><Tc r>Ср. запрос</Tc><Tc></Tc></THd>
+          <Tbl><THd><Tc>Модель</Tc><Tc>Тир</Tc><Tc r>{priceTab==="openrouter"?"OpenRouter":"API"} $/M</Tc><Tc r>Себест. ₽/M</Tc><Tc r>Клиент ₽/M</Tc><Tc r>Маржа</Tc><Tc r>Ср. запрос</Tc><Tc></Tc></THd>
           <tbody>{txt.map(m=>eId===m.id?(
             <tr key={m.id} style={{background:"#faf9f5"}}>
               <td style={tdc}><input value={fm.n} onChange={e=>setFm({...fm,n:e.target.value})} style={{...aI,width:130}}/></td>
               <td style={tdc}><select value={fm.t} onChange={e=>setFm({...fm,t:e.target.value})} style={{...aI,width:90}}>{["Базовый","Премиум","Ультра"].map(t=><option key={t}>{t}</option>)}</select></td>
-              <td style={{...tdc,textAlign:"right"}}><input type="number" step="0.01" value={fm.i} onChange={e=>setFm({...fm,i:e.target.value})} style={{...aI,width:50}}/><span style={{color:"#d0d0c8"}}> / </span><input type="number" step="0.01" value={fm.o} onChange={e=>setFm({...fm,o:e.target.value})} style={{...aI,width:50}}/></td>
+              {priceTab==="openrouter"?(
+                <td style={{...tdc,textAlign:"right"}}><input type="number" step="0.01" value={fm.i} onChange={e=>setFm({...fm,i:e.target.value})} style={{...aI,width:50}}/><span style={{color:"#d0d0c8"}}> / </span><input type="number" step="0.01" value={fm.o} onChange={e=>setFm({...fm,o:e.target.value})} style={{...aI,width:50}}/></td>
+              ):(
+                <td style={{...tdc,textAlign:"right"}}><input type="number" step="0.01" value={fm.di??fm.i} onChange={e=>setFm({...fm,di:e.target.value})} style={{...aI,width:50}}/><span style={{color:"#d0d0c8"}}> / </span><input type="number" step="0.01" value={fm.do_??fm.o} onChange={e=>setFm({...fm,do_:e.target.value})} style={{...aI,width:50}}/></td>
+              )}
               <td colSpan={3}><input value={fm.desc||""} onChange={e=>setFm({...fm,desc:e.target.value})} placeholder="Описание для тултипа" style={{...aI,width:"100%",fontFamily:"'Inter',sans-serif"}}/></td>
               <td style={tdc}><div style={{display:"flex",gap:4}}><button onClick={sv} style={svB}>✓</button><button onClick={cE} style={cnB}>✕</button></div></td>
             </tr>
           ):(
             <Rw key={m.id}>
               <Td b><div>{m.n}</div>{m.desc?<div style={{fontSize:11,fontWeight:400,color:"#b0b0a8",marginTop:2,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.desc}</div>:<div style={{fontSize:11,color:"#ddddd5",marginTop:2,fontStyle:"italic"}}>Нет описания</div>}</Td><Td g>{m.t}</Td>
-              <Td r mn>${m.i} / ${m.o}</Td>
+              <Td r mn>{priceTab==="openrouter"?`$${m.i} / $${m.o}`:`$${m.di??m.i} / $${m.do_??m.o}`}</Td>
               <Td r mn><G>{f(m.bI*cfg.usdRub,1)} / {f(m.bO*cfg.usdRub,0)}</G></Td>
               <Td r mn>{f(m.sIR,1)} / {f(m.sOR,0)}</Td>
               <Td r mn>{(m.mr*100).toFixed(0)}%</Td>
@@ -443,18 +474,22 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
         </Crd>
 
         <Crd title="Модели изображений" action={<button onClick={()=>ad("image")} style={addB}>+ Добавить</button>}>
-          <Tbl><THd><Tc>Модель</Tc><Tc r>OpenRouter $/шт</Tc><Tc r>Себест. ₽</Tc><Tc r>Клиент ₽</Tc><Tc r>Кредитов</Tc><Tc></Tc></THd>
+          <Tbl><THd><Tc>Модель</Tc><Tc r>{priceTab==="openrouter"?"OpenRouter":"API"} $/шт</Tc><Tc r>Себест. ₽</Tc><Tc r>Клиент ₽</Tc><Tc r>Кредитов</Tc><Tc></Tc></THd>
           <tbody>{im.map(m=>eId===m.id?(
             <tr key={m.id} style={{background:"#faf9f5"}}>
               <td style={tdc}><input value={fm.n} onChange={e=>setFm({...fm,n:e.target.value})} style={{...aI,width:130}}/></td>
-              <td style={{...tdc,textAlign:"right"}}><input type="number" step="0.001" value={fm.p} onChange={e=>setFm({...fm,p:e.target.value})} style={{...aI,width:70}}/></td>
+              {priceTab==="openrouter"?(
+                <td style={{...tdc,textAlign:"right"}}><input type="number" step="0.001" value={fm.p} onChange={e=>setFm({...fm,p:e.target.value})} style={{...aI,width:70}}/></td>
+              ):(
+                <td style={{...tdc,textAlign:"right"}}><input type="number" step="0.001" value={fm.dp??fm.p} onChange={e=>setFm({...fm,dp:e.target.value})} style={{...aI,width:70}}/></td>
+              )}
               <td colSpan={3}></td>
               <td style={tdc}><div style={{display:"flex",gap:4}}><button onClick={sv} style={svB}>✓</button><button onClick={cE} style={cnB}>✕</button></div></td>
             </tr>
           ):(
             <Rw key={m.id}>
               <Td b>{m.n}</Td>
-              <Td r mn>${m.p||0}</Td>
+              <Td r mn>{priceTab==="openrouter"?`$${m.p||0}`:`$${(m.dp??m.p)||0}`}</Td>
               <Td r mn><G>{f(m.bR,2)} ₽</G></Td>
               <Td r mn><b>{f(m.sR,2)} ₽</b></Td>
               <Td r mn>{f(m.cr,1)}</Td>
@@ -466,7 +501,7 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
         <div style={crd}>
           <div style={crdT}>Формулы</div>
           <div style={{fontSize:12,color:"#8a8a82",lineHeight:2,fontFamily:"'JetBrains Mono',monospace"}}>
-            <div>себестоимость = OpenRouter × {pm.toFixed(3)}</div>
+            <div>себестоимость = {priceTab==="openrouter"?"OpenRouter":"API"} × {pm.toFixed(3)}{priceTab==="direct"?" (без комиссии OR)":""}</div>
             <div>клиент = себест. × множитель тира</div>
             <div>₽/запрос = (in × токены + out × токены) / 1 000 000</div>
           </div>
@@ -530,7 +565,7 @@ export default function App(){
   useEffect(()=>{
     fetch("/api/settings").then(r=>r.json()).then(data=>{
       if(data&&data.mods){
-        const merged=data.mods.map(m=>{const d=DModels.find(dm=>dm.id===m.id);return {...m,desc:m.desc??(d?.desc??"")};});
+        const merged=data.mods.map(m=>{const d=DModels.find(dm=>dm.id===m.id);return {...m,desc:m.desc??(d?.desc??""),di:m.di??(d?.di??m.i),do_:m.do_??(d?.do_??m.o),dp:m.dp??(d?.dp??m.p)};});
         setMods(merged);
         setCfg({...DC,...data.cfg});
         setMg({...DM,...data.mg});
