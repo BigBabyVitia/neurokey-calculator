@@ -334,6 +334,7 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
   const [fm,setFm]=useState({});
   const [saved,setSaved]=useState(false);
   const [adminTab,setAdminTab]=useState("settings");
+  const [tblView,setTblView]=useState("full"); // "full" | "client"
   const sE=m=>{setEId(m.id);setFm({...m});};
   const cE=()=>{setEId(null);setFm({});};
   const sv=()=>{
@@ -446,7 +447,23 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
           </a>
         </div>
 
+        {/* Table view toggle */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+          <div/>
+          <div style={{display:"flex",gap:2,background:"#F5F4F0",borderRadius:8,padding:2}}>
+            {[{v:"full",l:"Полная"},{v:"client",l:"Для клиента"}].map(({v,l})=>(
+              <button key={v} onClick={()=>setTblView(v)} style={{
+                border:"none",padding:"5px 14px",borderRadius:7,fontSize:12,fontWeight:tblView===v?600:400,
+                cursor:"pointer",background:tblView===v?"#fff":"transparent",
+                color:tblView===v?"#1a1a18":"#b0b0a8",
+                boxShadow:tblView===v?"0 1px 3px rgba(0,0,0,.06)":"none",
+              }}>{l}</button>
+            ))}
+          </div>
+        </div>
+
         <Crd title="Текстовые модели" action={<button onClick={()=>ad("text")} style={addB}>+ Добавить</button>}>
+          {tblView==="full"?(
           <Tbl><THd><Tc>Модель</Tc><Tc>Тир</Tc><Tc r>{priceTab==="openrouter"?"OpenRouter":"API"} $/M</Tc><Tc r>Себест. ₽/M</Tc><Tc r>Клиент ₽/M</Tc><Tc r>Маржа</Tc><Tc r>Ср. запрос</Tc><Tc></Tc></THd>
           <tbody>{txt.map(m=>eId===m.id?(
             <tr key={m.id} style={{background:"#faf9f5"}}>
@@ -471,9 +488,21 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
               <td><button onClick={()=>sE(m)} style={eB}>✎</button><button onClick={()=>dl(m.id)} style={dB}>✕</button></td>
             </Rw>
           ))}</tbody></Tbl>
+          ):(
+          <Tbl><THd><Tc>Модель</Tc><Tc>Тир</Tc><Tc r>Input ₽/M</Tc><Tc r>Output ₽/M</Tc><Tc r>Ср. запрос</Tc></THd>
+          <tbody>{txt.map((m,i)=>(
+            <Rw key={i}>
+              <Td b>{m.n}</Td><Td g>{m.t}</Td>
+              <Td r mn>{f(m.sIR,1)}</Td>
+              <Td r mn>{f(m.sOR,0)}</Td>
+              <Td r mn>{f(m.sz.medium.ccR)} ₽</Td>
+            </Rw>
+          ))}</tbody></Tbl>
+          )}
         </Crd>
 
         <Crd title="Модели изображений" action={<button onClick={()=>ad("image")} style={addB}>+ Добавить</button>}>
+          {tblView==="full"?(
           <Tbl><THd><Tc>Модель</Tc><Tc r>{priceTab==="openrouter"?"OpenRouter":"API"} $/шт</Tc><Tc r>Себест. ₽</Tc><Tc r>Клиент ₽</Tc><Tc r>Кредитов</Tc><Tc></Tc></THd>
           <tbody>{im.map(m=>eId===m.id?(
             <tr key={m.id} style={{background:"#faf9f5"}}>
@@ -496,16 +525,26 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
               <td><button onClick={()=>sE(m)} style={eB}>✎</button><button onClick={()=>dl(m.id)} style={dB}>✕</button></td>
             </Rw>
           ))}</tbody></Tbl>
+          ):(
+          <Tbl><THd><Tc>Модель</Tc><Tc r>Клиент ₽/шт</Tc><Tc r>Кредитов</Tc></THd>
+          <tbody>{im.map((m,i)=>(
+            <Rw key={i}>
+              <Td b>{m.n}</Td>
+              <Td r mn><b>{f(m.sR,2)} ₽</b></Td>
+              <Td r mn>{f(m.cr,1)}</Td>
+            </Rw>
+          ))}</tbody></Tbl>
+          )}
         </Crd>
 
-        <div style={crd}>
+        {tblView==="full" && <div style={crd}>
           <div style={crdT}>Формулы</div>
           <div style={{fontSize:12,color:"#8a8a82",lineHeight:2,fontFamily:"'JetBrains Mono',monospace"}}>
             <div>себестоимость = {priceTab==="openrouter"?"OpenRouter":"API"} × {pm.toFixed(3)}{priceTab==="direct"?" (без комиссии OR)":""}</div>
             <div>клиент = себест. × множитель тира</div>
             <div>₽/запрос = (in × токены + out × токены) / 1 000 000</div>
           </div>
-        </div>
+        </div>}
       </>}
 
       {adminTab==="requests" && (
