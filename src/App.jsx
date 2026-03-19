@@ -3,7 +3,7 @@ import { isValidPhoneNumber } from "libphonenumber-js";
 import { Analytics } from "@vercel/analytics/react";
 
 
-const DC = { bankCommission: 0.03, openrouterCommission: 0.055, usdRub: 80, creditPriceUsd: 0.01, contactUrl: "https://t.me/Lud_AI", pricingMode: "openrouter" };
+const DC = { bankCommission: 0.03, openrouterCommission: 0.055, usdRub: 80, creditPriceUsd: 0.01, contactUrl: "https://t.me/Lud_AI", pricingMode: "openrouter", usdRubMode: "manual", usdRubMarkup: 0.02 };
 const DM = { "Базовый": 0.80, "Премиум": 0.55, "Ультра": 0.45, "Дизайн": 0.55 };
 const SZ = {
   small:  { l: "Малый",   i: 1000,  o: 300 },
@@ -356,6 +356,21 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
   const [saved,setSaved]=useState(false);
   const [adminTab,setAdminTab]=useState("settings");
   const [tblView,setTblView]=useState("full"); // "full" | "client"
+  const [cbrRate,setCbrRate]=useState(null);
+  const [cbrLoading,setCbrLoading]=useState(false);
+
+  // Fetch CBR rate on mount and when switching to auto
+  useEffect(()=>{
+    if(cfg.usdRubMode!=="auto") return;
+    setCbrLoading(true);
+    fetch("/api/cbr-rate").then(r=>r.json()).then(d=>{
+      if(d.rate){
+        setCbrRate(d.rate);
+        setCfg(c=>({...c,usdRub:+(d.rate*(1+(c.usdRubMarkup||0))).toFixed(2)}));
+      }
+    }).catch(()=>{}).finally(()=>setCbrLoading(false));
+  },[cfg.usdRubMode]);
+
   const sE=m=>{setEId(m.id);setFm({...m});};
   const cE=()=>{setEId(null);setFm({});};
   const sv=()=>{
@@ -433,13 +448,48 @@ function Admin({mods,setMods,cfg,setCfg,mg,setMg,reqs,onSave,onReset,dirty,savin
         <div className="nk-admin-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
           <div style={crd}>
             <div style={crdT}>Константы</div>
-            {[{k:"bankCommission",l:"Комиссия банка",s:"%",m:100},{k:"openrouterCommission",l:"OpenRouter",s:"%",m:100},{k:"usdRub",l:"Курс USD/RUB",s:"₽"},{k:"creditPriceUsd",l:"1 кредит",s:"$"}].filter(({k})=>priceTab==="openrouter"||k!=="openrouterCommission").map(({k,l,s,m})=>(
+            {[{k:"bankCommission",l:"Комиссия банка",s:"%",m:100},{k:"openrouterCommission",l:"OpenRouter",s:"%",m:100},{k:"creditPriceUsd",l:"1 кредит",s:"$"}].filter(({k})=>priceTab==="openrouter"||k!=="openrouterCommission").map(({k,l,s,m})=>(
               <div key={k} style={aR}>
                 <span style={aL}>{l}</span>
                 <input type="number" step="any" value={m?+(cfg[k]*m).toFixed(2):cfg[k]} onChange={e=>setCfg({...cfg,[k]:m?(+e.target.value||0)/m:+e.target.value||0})} style={aI}/>
                 <span style={{fontSize:12,color:"#b0b0a8"}}>{s}</span>
               </div>
             ))}
+            {/* USD/RUB rate — auto/manual */}
+            <div style={{...aR,flexWrap:"wrap"}}>
+              <span style={aL}>Курс USD/RUB</span>
+              <div style={{display:"flex",gap:2,background:"#F5F4F0",borderRadius:6,padding:1}}>
+                {[{v:"manual",l:"Ручной"},{v:"auto",l:"ЦБ авто"}].map(({v,l})=>(
+                  <button key={v} onClick={()=>setCfg({...cfg,usdRubMode:v})} style={{
+                    border:"none",padding:"3px 10px",borderRadius:5,fontSize:11,fontWeight:cfg.usdRubMode===v?600:400,
+                    cursor:"pointer",background:cfg.usdRubMode===v?"#fff":"transparent",
+                    color:cfg.usdRubMode===v?"#1a1a18":"#b0b0a8",
+                  }}>{l}</button>
+                ))}
+              </div>
+            </div>
+            {cfg.usdRubMode==="auto"?(
+              <div>
+                <div style={aR}>
+                  <span style={aL}>Наценка</span>
+                  <input type="number" step="0.1" value={+((cfg.usdRubMarkup||0)*100).toFixed(1)} onChange={e=>{
+                    const mk=Math.max(0,(+e.target.value||0))/100;
+                    const nr=cbrRate?+(cbrRate*(1+mk)).toFixed(2):cfg.usdRub;
+                    setCfg({...cfg,usdRubMarkup:mk,usdRub:nr});
+                  }} style={{...aI,width:48}}/>
+                  <span style={{fontSize:12,color:"#b0b0a8"}}>%</span>
+                </div>
+                <div style={{fontSize:12,color:"#b0b0a8",marginTop:4}}>
+                  {cbrLoading?"Загрузка курса ЦБ…":cbrRate?<>ЦБ: <b style={{color:"#5a5a52"}}>{cbrRate.toFixed(2)} ₽</b> + {((cfg.usdRubMarkup||0)*100).toFixed(0)}% = <b style={{color:"#1a1a18"}}>{cfg.usdRub} ₽</b></>:"Не удалось загрузить курс ЦБ"}
+                </div>
+              </div>
+            ):(
+              <div style={aR}>
+                <span style={aL}> </span>
+                <input type="number" step="any" value={cfg.usdRub} onChange={e=>setCfg({...cfg,usdRub:+e.target.value||0})} style={aI}/>
+                <span style={{fontSize:12,color:"#b0b0a8"}}>₽</span>
+              </div>
+            )}
             <div style={{marginTop:8,fontSize:12,color:"#b0b0a8"}}>Множитель: <b style={{color:"#5a5a52"}}>{pm.toFixed(3)}</b></div>
           </div>
           <div style={crd}>
