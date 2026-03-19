@@ -138,6 +138,9 @@ function Client({mods,cfg,mg,addReq}){
   const imgL=useMemo(()=>im.map(m=>{const t=Math.floor(bud/m.sR);return {...m,t,pp:Math.floor(t/emp)};}),[im,bud,emp]);
 
   const perPerson = Math.round(bud/emp);
+  const creditPriceRub = cfg.creditPriceUsd * cfg.usdRub;
+  const totalCredits = Math.floor(bud / creditPriceRub);
+  const creditsPerPerson = Math.floor(totalCredits / emp);
 
   return (
     <div>
@@ -152,6 +155,24 @@ function Client({mods,cfg,mg,addReq}){
         <div className="nk-hero-inputs" style={{display:"flex",gap:16,maxWidth:560,marginInline:"auto"}}>
           <div style={{flex:1,textAlign:"left"}}><label style={lbl}>Бюджет, ₽</label><NumIn value={bud} onChange={setBud} style={mInp} className="nk-main-input"/></div>
           <div style={{flex:1,textAlign:"left"}}><label style={lbl}>Сотрудников</label><NumIn value={emp} onChange={v=>setEmp(Math.max(1,v))} style={mInp} className="nk-main-input"/></div>
+        </div>
+      </div>
+
+      {/* Credits card */}
+      <div style={{padding:"16px 0 0",maxWidth:600,marginInline:"auto"}}>
+        <div style={{background:"#fff",borderRadius:12,padding:"14px 20px"}}>
+          <div style={{fontSize:12,color:"#a0a098",marginBottom:8}}>Кредитов на бюджет</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+            <div style={{background:"#fafaf8",borderRadius:8,padding:"8px 12px"}}>
+              <div style={{fontSize:11,color:"#a0a098",marginBottom:4}}>всего</div>
+              <div style={{fontSize:20,fontWeight:700,color:"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{fi(totalCredits)}</div>
+            </div>
+            <div style={{background:"#fafaf8",borderRadius:8,padding:"8px 12px"}}>
+              <div style={{fontSize:11,color:"#a0a098",marginBottom:4}}>на сотрудника</div>
+              <div style={{fontSize:20,fontWeight:700,color:"#1a1a18",fontFamily:"'JetBrains Mono',monospace"}}>{fi(creditsPerPerson)}</div>
+            </div>
+          </div>
+          <div style={{fontSize:11,color:"#c5c5bc",marginTop:6}}>1 кредит = {creditPriceRub.toFixed(2)} ₽</div>
         </div>
       </div>
 
