@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { getCbrRate } from "./_cbr.js";
 
 const redis = Redis.fromEnv();
 const KEY = "nk-settings";
@@ -9,6 +10,19 @@ export default async function handler(req, res) {
     try {
       const data = await redis.get(KEY);
       if (!data) return res.status(200).json(null);
+
+      // Если режим курса USD/RUB — авто, подмешиваем свежий курс ЦБ + наценку.
+      // При ошибке ЦБ оставляем сохранённый usdRub как fallback.
+      if (data?.cfg?.usdRubMode === "auto") {
+        const cbr = await getCbrRate();
+        if (cbr?.rate) {
+          const markup = data.cfg.usdRubMarkup || 0;
+          data.cfg.usdRub = +(cbr.rate * (1 + markup)).toFixed(2);
+          data.cfg.cbrRate = cbr.rate;
+          data.cfg.cbrDate = cbr.date;
+        }
+      }
+
       return res.status(200).json(data);
     } catch (e) {
       console.error("Redis GET error:", e);
